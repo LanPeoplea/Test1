@@ -264,3 +264,26 @@ System.out.println("msg:"+msg);
    * 只有服务器正常关闭时，才会执行destroy方法
    * destroy方法在Servlet被销毁之前执行，一般用于释放资源
 
+#####  Servlet 3.0
+
+* 支持注解配置，可以不需要web.xml了
+* 创建一个JavaEE项目，选择Servlet版本3.0以上，可以不创建web.xml
+* 在类上使用@WebServlet注解，进行配置
+  * @WebServlet("URL名称")
+
+##### Servlet相关配置
+
+* 一个Servlet可以定义多个访问路径 : @WebServlet({"/url1","/url2","/url33"})
+* 路径定义规则：
+  1. 可以定义为/xxx/*     /xxx/后任意匹配
+  2. 可以定义为/*            优先级最低，匹配不到才会被使用
+  3. 可以定义为 *.do       扩展名匹配    前面不要加/
+
+# IDEA与Tomcat的相关配置
+
+1. IDEA会为每一个tomcat部署的项目单独建立一份配置文件
+   * 查看控制台的log ： Using CATALINA_BASE:   "C:\Users\lan 人\.IntelliJIdea2019.2\system\tomcat\Tomcat_8_5_50_BiLibili"
+2. 工作空间项目    和    tomcat部署的web项目
+   * tomcat真正访问的是“tomcat部署的web项目”，“tomcat部署的web项目”对应着"工作空间项目"的web目录下的所有资源
+   * WEB-INf目录下的资源不能被浏览器直接访问。
+3. 断点调试：使用”debug“启动
