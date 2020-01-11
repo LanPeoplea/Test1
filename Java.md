@@ -287,3 +287,96 @@ System.out.println("msg:"+msg);
    * tomcat真正访问的是“tomcat部署的web项目”，“tomcat部署的web项目”对应着"工作空间项目"的web目录下的所有资源
    * WEB-INf目录下的资源不能被浏览器直接访问。
 3. 断点调试：使用”debug“启动
+
+# XML
+
+##### 概念：Extensible Markup Langage  可扩展标记语言
+
+- 可扩展：标签都是自定义的。  <user> <student>
+
+##### 功能
+
+* 存储数据
+
+  1、 配置文件
+
+  2、 在网络中传输
+
+##### xml与html的区别
+
+- xml标签都是自定义的，html标签是预定义
+- xml的语法严格，html语法松散
+- xml是存储数据的，html是展示数据
+- w3c：万维网联盟
+
+##### 语法
+
+* 基本语法：
+
+  	1. xml文档的后缀名 .xml
+   	2. xml第一行必须定义为文档声明
+   	3. xml文档中有且仅有一个根标签
+   	4. 属性值必须用引号（单双都可）引起来
+   	5. 标签必须正确关闭
+   	6. xml标签名称区分大小写
+
+* 快速入门：
+
+  ```xml
+  <?xml version='1.0' ?>
+  
+  <users>
+  
+  	<user id='1'>
+  		<name>zhangsan</name>
+  		<age>23</age>
+  		<gender>male</gender>
+  	</user>
+  	
+  	<user id='2'>
+  		<name>lisi</name>
+  		<age>24</age>
+  		<gender>female</gender>
+  	</user>
+  	
+  </users>
+  ```
+
+* 组成部分：
+
+  1. 文档声明：格式：<?xml 属性列表 ?>
+
+     1. 属性列表：
+        * version : 版本号，必须的属性
+        * encoding : 编码方式。告知解析引擎当前文档使用的字符集，默认值：ISO-8859-1
+        * standalone : 是否独立
+          * 取值：
+            * yes：不依赖其他文件
+            * no：依赖其他文件
+
+  2. 指令：结合css的
+
+     ```xml
+     <?xml-stylesheet type="text/css" href="a.css" ?>
+     ```
+
+  3. 标签：标签名称自定义的
+
+     * 规则：
+       * 名称可以包含字母、数字以及其他的字符
+       * 名称不能以数字或者标点符号开始
+       * 名称不能以字母xml（或者XML、Xml等等开始）
+       * 名称不能包含空格
+
+  4. 属性：
+
+     id属性值唯一
+
+  5. 文本
+
+     * CDATA区：在该区域中的数据会被原样展示
+
+       <![CDATA[ if(a < b && a > c) {} ]]>
+
+       <![CDATA[ 数据 ]]>
+
