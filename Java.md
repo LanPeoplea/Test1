@@ -1,5 +1,13 @@
 # Java EE
 
+## IDEA中那些快捷键
+
+#### 输出语句		sout
+
+#### 遍历语句		iter
+
+#### 生成set/get方法		右键generate	或者	alt + insert
+
 #### ServletContext
 
 ##### 1、概念：代表整个web应用，可以和程序的容器（服务器）来通信
@@ -279,6 +287,67 @@ System.out.println("msg:"+msg);
   2. 可以定义为/*            优先级最低，匹配不到才会被使用
   3. 可以定义为 *.do       扩展名匹配    前面不要加/
 
+# MVC:开发模式
+
+* MVC：
+
+  1. M：Model，模型。JavaBean
+     * 完成具体的业务操作，如：查询数据库、封装对象
+  2. V：View，视图。JSP
+     * 展示数据
+  3. C：Controller，控制器。Servlet
+     * 获取用户的输入
+     * 调用模型
+     * 将数据交给视图进行展示
+
+  * 优缺点：
+    1. 优点：
+       * 耦合性低，方便维护，可以利于分工协作
+       * 重用性高
+    2. 缺点：：
+       * 使得项目架构变得复杂，对开发人员要求高
+
+## EL表达式
+
+#### 概念：Expression Language 表达式语言
+
+#### 作用：替换和简化jsp页面中java代码的编写
+
+#### 语法：${表达式}
+
+#### 注意：
+
+* jsp默认支持EL表达式
+  * 想要忽略EL表达式：
+    1. 设置jsp中page指令中：isELIgnored="true" 忽略当前jsp页面中的所有EL表达式
+    2. ${表达式}   前面加上\：忽略当前这个EL表达式
+
+#### 使用：
+
+1. 运算：
+   * 运算符：
+     1. 算术运算符：+ - * /(div) %(mod)
+     2. 比较运算符：>  <  >=  <=  ==  !=
+     3. 逻辑运算符：&&(and)  ||(or)  !(not)
+     4. 空运算符：empty
+        * 功能：用于判断字符串、集合、数组长度对象是否为null并且长度是否为0，
+        * ${empty list}
+2. 获取值
+   1. EL表达式只能从域对象中获取值
+   2. 语法：
+      1. ${域名称.键名}：从指定域中获取指定键的值
+         * 域名称：
+           1. pageScope  --->   pageContext
+           2. requestScope  --->  request
+           3. sessionScope  --->  session
+           4. applicationScope  --->  applocation(ServletContext)
+         * 举例：在request域中存储了name=张三
+         * 获取：${requestScope.name}
+      2. ${键名}：表示依次从最小的域中查找是否有该键对应的值，直到找到为止
+      3. 获取对象、List集合、Map集合的值
+         1. 对象：${域名称.键名.属性名}
+            * 本质上会去调用对象的getter方法
+
 # IDEA与Tomcat的相关配置
 
 1. IDEA会为每一个tomcat部署的项目单独建立一份配置文件
@@ -380,3 +449,200 @@ System.out.println("msg:"+msg);
 
        <![CDATA[ 数据 ]]>
 
+##### 约束：规定xml文档的书写规则
+
+* 作为框架的使用者（程序员）：
+
+  1. 能够在xml中引入约束文档
+  2. 能够简单地读懂约束文档
+
+* 分类：
+
+  1. DTD：一种简单的约束技术
+  2. Schema：一种复杂的约束技术
+
+* DTD：
+
+  * 引入dtd文档到xml文档中
+    * 内部dtd：将约束规则定义在xml文档中
+    * 外部dtd：将约束规则定义在外部的dtd文件中
+      1. 本地：<!DOCTYPE 根标签名  SYSTEM "dtd文件的位置">
+      2. 网络：<!DOCTYPE 根标签名 PUBLIC "dtd文件名字" "dtd文件的位置">
+
+* Schema：
+
+  ```xml
+  <?xml version='1.0' ?>
+  <!--
+  	1.填写xml文档的根元素
+  	2.引入xsi前缀.  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	3.引入xsd文件命名空间.  xsi:schemaLocation="http://www.itcast.cn/xml	student.xsd"
+  	4.为每一个xsd约束声明一个前缀，作为标识  xmlns="http://www.itcast.cn/xml"
+  <students	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  		    xmlns="http://www.itcast.cn/xml"
+  		  xsi:schemaLocation="http://www.itcast.cn/xml	student.xsd"
+  			>
+  	<student number="heima_0001">
+  		<name>zhangsan</name>
+  		<age>11</age>
+  		<sex>male</sex>
+  	</student>
+  </students>
+  ```
+
+##### 解析：操作xml文档，将文档中的数据读取到内存中
+
+* 操作xml文档
+  1. 解析（读取）：将文档中的数据读取到内存中
+  2. 写入：将内存中的数据保存到xml文档中。持久化地存储
+* 解析xml的方式：
+  1. DOM：将标记语言文档一次性加载进内存中，在内存中形成一棵DOM树（多用于服务器端）
+     * 优点：操作方便，可以对文档进行CRUD的所有操作
+     * 缺点：占内存
+  2. SAX：逐行读取，基于事件驱动的（多用于移动端）
+     * 优点：不占内存
+     * 缺点：只能读取，不能增删改
+* xml常见的解析器：
+  1. JAXP：sun公司提供的解析器，支持DOM和SAX两种思想。
+  2. DOM4J：一款非常优秀的解析器。
+  3. Jsoup：jsoup是一款Java的HTML解析器，可直接解析某个URL地址、HTML文本内容。它提供了一套非常省力的API，可通过DOM，CSS以及类似于jQuery的操作方法来取出和操作数据。
+  4. PULL：Android操作系统内置的解析器，SAX方式的。
+
+##### Jsoup
+
+* 快速入门：
+
+  * 步骤：
+    1. 导入jar包
+    2. 获取Document对象
+    3. 获取对应的标签Element对象
+    4. 获取数据
+
+* 代码
+
+  ```java
+  //获取Document对象，根据xml文档获取
+          //获取student.xml的path
+          String path = JsoupDemo1.class.getClassLoader().getResource("student.xml").getPath();
+          //解析xml文档，加载文档进内存，获取dom树--->Document对象
+          Document document = Jsoup.parse(new File(path), "UTF-8");
+          //获取元素对象 Element
+          Elements elements = (Elements) document.getElementsByTag("name");
+  //        System.out.println(elements);
+          //获取第一个name的element对象
+          Element element = elements.get(1);
+          System.out.println(element.text());
+  ```
+
+* 对象的使用：
+
+  1. Jsoup：工具类，可以解析html或xml文档，返回Document
+
+     * parse：解析html或者xml文档，返回Document
+
+       * parse(File in,String charsetName):解析xml或者html文件的
+
+         ```java
+         //获取student.xml的path
+                 String path = JsoupDemo2.class.getClassLoader().getResource("student.xml").getPath();
+                 //1 解析xml文档，加载文档进内存，获取dom树--->Document对象
+                 Document document = Jsoup.parse(new File(path), "UTF-8");
+                 System.out.println(document);
+         ```
+
+         
+
+       * parse(String html)：解析xml或者html字符串
+
+         ```java
+         String str = "<?xml version='1.0' ?>\n" +
+                         "\n" +
+                         "<students>\n" +
+                         "\t<student number=\"heima_0001\">\n" +
+                         "\t\t<name>tom</name>\n" +
+                         "\t\t<age>18</age>\n" +
+                         "\t\t<sex>male</sex>\n" +
+                         "\t</student>\n" +
+                         "\t<student number=\"heima_0002\">\n" +
+                         "\t\t<name>xiaowen</name>\n" +
+                         "\t\t<age>20</age>\n" +
+                         "\t\t<sex>female</sex>\n" +
+                         "\t</student>\n" +
+                         "</students>";
+                 Document document = Jsoup.parse(str);
+                 System.out.println(document);
+         ```
+
+         
+
+       * parse(URL url,int timeoutMillis)：通过网络路径获取指定的html或xml的文档对象
+
+         ```java
+         URL url = new URL("https://baike.baidu.com/item/%E6%9C%B1%E8%8C%B5/10617?fr=aladdin5");       //代表网络中的一个资源路径
+                 Document document = Jsoup.parse(url,10000);
+                 System.out.println(document);
+         ```
+
+         
+
+  2. Document：文档对象。代表内存中的dom树
+
+     * 获取ELement对象
+
+       * getElementById(String id)：根据id属性值获取唯一的element对象
+
+       * getElementsByTag(String tagName)：根据标签名称获取元素对象集合
+
+       * getElementsByAttribute(String key)：根据属性名称获取元素对象集合
+
+       * getElementsByAttributeValue(String key,String value)：根据对应的属性名和属性值获取元素对象集合
+
+         
+
+  3. Elements：元素Element对象的集合。可以当作ArrayList<Element>来使用
+
+  4. Element：元素对象
+
+     1. 获取子元素对象
+
+        * getElementById(String id)：根据id属性值获取唯一的element对象
+
+        - getElementsByTag(String tagName)：根据标签名称获取元素对象集合
+        - getElementsByAttribute(String key)：根据属性名称获取元素对象集合
+        - getElementsByAttributeValue(String key,String value)：根据对应的属性名和属性值获取元素对象集合
+
+     2. 获取属性值
+
+        * String attr(String key)：根据属性名称获取属性值     不区分大小写
+
+     3. 获取文本内容
+
+        * String text()：获取所有子标签的纯文本内容
+        * String html()：获取标签体的所有内容（包括子标签的标签和文本内容）
+
+  5. Node：节点对象
+
+     * 是Document和Element的父类
+
+* 快捷查询方式：
+
+  1. **selector：选择器**
+
+     * 使用的方法：Elements select(String cssQuery)
+
+       * 语法：参考Selector类中定义的语法
+
+         ```java
+         //获取id为heima_0001的student标签的age标签
+         System.out.println(document.select("student[number='heima_0001']>age"));
+         ```
+
+         使用 > 获取直接子标签
+
+         使用空格获取所有子标签
+
+  2. **XPath**：
+
+     * XPath即为[XML](https://baike.baidu.com/item/XML)路径语言（XML Path Language），它是一种用来确定XML文档中某部分位置的语言
+     * 使用Jsoup的XPath需要额外导入jar包
+     * 查询w3cshool参考手册，使用XPath的语法完成查询
