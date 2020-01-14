@@ -376,20 +376,118 @@ System.out.println("msg:"+msg);
 
 # JSTL
 
-   					1. 概念：JavaServer Pages Tag Library     JSP标注标签库
-           * 是由Apache组织提供的开源的免费的jsp标签
-					2. 作用：用于简化和替换jsp页面上的java代码
-					3. 使用步骤：
-        1. 导入jstl相关jar包
-        2. 引入标签库：taglib指令：<%@ taglib %>
-        3. 使用标签
-					4. 常用的JSTL标签
-        1. if							：相当于java代码的if语句
-           * 属性：
-              	1. test    必须属性，接收boolean表达式
-                  * 如果表达式为true，则显示if标签体内容；如果为false，则不显示
-        2. choose                  ：相当于java代码的switch语句
-        3. foreach                  ：相当于java代码的for语句
+#### 概念：JavaServer Pages Tag Library     JSP标注标签库
+
+				* 是由Apache组织提供的开源的免费的jsp标签
+
+#### 作用：用于简化和替换jsp页面上的java代码
+
+#### 使用步骤：
+
+1. 导入jstl相关jar包
+2. 引入标签库：taglib指令：<%@ taglib %>
+3. 使用标签
+
+#### 常用的JSTL标签：
+
+1. if				:相当于java代码的if语句
+
+   * 属性：
+
+     * test			：必须属性，接收Boolean表达式
+       * 如果表达式为true，则显示if标签体内容；如果为false，则不显示
+       * 一般情况下，test属性值会结合EL表达式一起使用
+
+   * 注意：c:if 标签没有else情况，想要else情况，则可以再定义一个c:if 标签
+
+     ```jsp
+     <c:if test="true">
+             IDEA真垃圾
+     </c:if><hr>
+     	<%
+     		//判断request域中一个list集合是否为空，如果不为null则显示遍历集合
+     		
+     		List list = new ArrayList();
+     		list.add("小雯");
+     		request.setAttribute("list",list);
+     		request.setAttribute("number",7);
+     	%>
+     	
+     	<c:if test="${not empty list}">
+     		遍历集合......
+     		
+     	</c:if>
+     	<hr>
+     	<c:if test="${number % 2 != 0 }">
+     		${number }是一个奇数
+     	</c:if>
+     ```
+
+2. choose      ：相当于java代码的switch语句
+
+   ```jsp
+   <% request.setAttribute("number",5);	%>
+   	<c:choose>
+   		<c:when test="${number == 1}">星期一</c:when>
+   		<c:when test="${number == 2}">星期二</c:when>
+   		<c:when test="${number == 3}">星期三</c:when>
+   		<c:when test="${number == 4}">星期四</c:when>
+   		<c:when test="${number == 5}">星期五</c:when>
+   		<c:when test="${number == 6}">星期六</c:when>
+   		<c:when test="${number == 7}">星期日</c:when>
+   		<c:otherwise>数字输入有误</c:otherwise>
+   	</c:choose>
+   ```
+
+3. forEach      ：相当于java代码的for语句
+
+   * 完成重复的操作
+
+     * 属性：
+
+       * begin：开始值
+
+       * end：结束值
+
+       * var：临时变量
+
+       * step：步长
+
+       * varStatus：循环状态对象
+
+         1. index：容器中元素的索引，从0开始
+
+         2. count：循环次数，从1开始
+
+   * 遍历容器
+
+     * 属性：
+
+       * items：容器对象
+
+       * var：容器中元素的临时变量
+
+       * varStatus：循环状态对象
+
+         1. index：容器中元素的索引，从0开始
+
+         2. count：循环次数，从1开始
+
+            ```jsp
+            <c:forEach begin="1" end="10" var="i" step="1" varStatus="s">
+            		${i} &nbsp;${s.index}&nbsp;${s.count }<br>
+            	</c:forEach>
+            	<hr>
+            	<% 
+            		List list = new ArrayList();
+            		list.add("aa");
+            		list.add("bb");
+            		request.setAttribute("list",list);
+            	%>
+            	<c:forEach items="${list}" var="str" varStatus="s">
+            		${str}&nbsp;${s.index}&nbsp;${s.count }<br>
+            	</c:forEach>
+            ```
 
 # IDEA与Tomcat的相关配置
 
@@ -689,3 +787,89 @@ System.out.println("msg:"+msg);
      * XPath即为[XML](https://baike.baidu.com/item/XML)路径语言（XML Path Language），它是一种用来确定XML文档中某部分位置的语言
      * 使用Jsoup的XPath需要额外导入jar包
      * 查询w3cshool参考手册，使用XPath的语法完成查询
+
+# jQuery
+
+#### 概念：一个javaScript框架。简化js开发
+
+* JavaScript框架：本质上就是一些js文件，封装了js的原生代码而已
+
+#### 快速入门
+
+* 步骤：
+
+  1. 下载jQuery
+
+     * jquery-xxx.js与jquery-xxx.min.js
+       * jquery-xxx.js:开发版本。给程序员看的，有良好的缩进和注释，体积大一些
+       * jquery-xxx.min.js:生产版本。程序中使用，没有缩进，体积小一些，程序加载更快
+
+  2. 导入jQuery的js文件：导入min.js文件
+
+  3. 使用
+
+     ```js
+     var div1 = $("#div1");
+     alert(div1.html());
+     ```
+
+* jQuery对象和js对象区别与转换
+
+  * 都可以当作数组来使用
+
+  * jQuery对象在操作时，更加方便
+
+  * jQuery对象和js对象方法不通用的
+
+  * 两者之间可以相互转换
+
+    * jq -------->  js：jq对象[索引]  或者   jq对象.get(索引)
+    * js  -------->  jq：$(js对象)
+
+    ```js
+    //1. 通过js方式来获取名称叫div的所有html对象
+            var divs = document.getElementsByTagName("div");
+            alert(divs.length);    //可以将其当作数组来使用
+            //对divs中所有的div 让其标签体内容变为"aaa"
+            for (var i = 0; i < divs.length; i++) {
+                // divs[i].innerHTML = "aaa";
+                // $(divs[i]).html("哈哈哈");
+            }
+            //2. 通过jQuery方式
+            var $divs = $("div");
+            alert($divs.length);   //也可以当作数组使用
+    
+            //对divs中所有的div 让其标签体内容变为"bbb"
+            // $divs.html("bbb");
+            $divs[0].innerHTML = "20200114";
+            $divs.get(1).innerHTML = "this is wawu";
+    ```
+
+* 选择器：筛选具有相似特征的元素（标签）
+
+  1. 基本语法学习：
+
+     1. 事件绑定
+
+        ```js
+        $(".b1").click(function(){
+            alert("弹弹弹");
+        });
+        ```
+
+     2. 入口函数
+
+        * window.onload 和 $(function) 区别:
+          * window.onload只能定义一次，如果定义多次，后边的会将前边的覆盖掉
+          * $(function)可以定义多次的
+
+        ```js
+        $(function () {
+                // 获取b1按钮
+                $(".b1").click(function(){
+                    alert("弹弹弹");
+                });
+        })
+        ```
+
+     3. 样式控制
