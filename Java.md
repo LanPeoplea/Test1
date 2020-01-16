@@ -957,4 +957,97 @@ System.out.println("msg:"+msg);
                    });
            ```
   
-           
+
+# Mybatis
+
+		### 概述
+
+* 一个优秀的基于java的持久层框架，内部封装了jdbc，使开发者只需要关注sql语句本身，而不需要花费精力去处理加载驱动、创建连接、创建statement等繁杂的过程
+* 通过xml或注解方式将各种statement配置起来
+* 使用ORM思想实现了结果集的封装
+
+### ORM
+
+* Object Realtional Mapping        对象关系映射
+
+
+### 环境搭建
+
+* 创建maven工程并导入坐标
+
+  ```xml
+  <dependency>
+              <groupId>org.mybatis</groupId>
+              <artifactId>mybatis</artifactId>
+              <version>3.4.5</version>
+          </dependency>
+          <dependency>
+              <groupId>mysql</groupId>
+              <artifactId>mysql-connector-java</artifactId>
+              <version>5.1.6</version>
+          </dependency>
+  ```
+
+* 创建实体类和dao的接口
+
+* 创建Mybatis的主配置文件
+
+  * 在resources目录下创建 SqlMapConfig.xml
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE configuration
+            PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+            "http://mybatis.org/dtd/mybatis-3-config.dtd">
+    <!-- mybatis的主配置文件 -->
+    <configuration>
+        <!-- 配置环境 -->
+        <environments default="mysql">
+            <!-- 配置mysql的环境 -->
+            <environment id="mysql">
+                <!-- 配置事务的类型 -->
+                <transactionManager type="JDBC"></transactionManager>
+                <!-- 配置数据源（连接池） -->
+                <dataSource type="POOLEd">
+                    <!-- 配置连接数据库的四个基本信息 -->
+                    <property name="driver" value="com.mysql.jdbc.Driver"/>
+                    <property name="url" value="jdbc:mysql://localhost:3306/maven"/>
+                    <property name="username" value="root"/>
+                    <property name="password" value="123"/>
+                </dataSource>
+            </environment>
+        </environments>
+    
+        <!-- 指定映射配置文件的位置，映射配置文件指的是每个dao独立的配置文件 -->
+        <mappers>
+            <mapper resource="dao/UserDao.xml" />
+        </mappers>
+    </configuration>
+    ```
+
+  * 在resources对应目录下创建对应dao.xml文件
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper
+            PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+            "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="dao.UserDao">
+        <!-- 配置查询所有 -->
+        <select id="findAll">
+            select * from user
+        </select>
+    </mapper>
+    ```
+
+### 环境搭建注意事项
+
+1. 在Mybatis中把持久层的操作接口名称和映射文件也叫做Mapper
+
+   所以  **UserDao.xml** 和 **UserMapper.xml**是一样的
+
+2. Mybatis的映射配置文件结构必须和dao接口的包结构相同
+
+3. 映射配置文件的mapper标签namespace属性的取值必须是dao接口的全限定类名
+
+4. 映射配置文件的操作配置（select），id属性的取值必须是dao接口的方法名
