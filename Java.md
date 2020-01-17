@@ -1032,7 +1032,7 @@ System.out.println("msg:"+msg);
     <!DOCTYPE mapper
             PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-    <mapper namespace="dao.UserDao">
+    <mapper namespace="dao.UserDao" resultType="domain.User">
         <!-- 配置查询所有 -->
         <select id="findAll">
             select * from user
@@ -1051,3 +1051,43 @@ System.out.println("msg:"+msg);
 3. 映射配置文件的mapper标签namespace属性的取值必须是dao接口的全限定类名
 
 4. 映射配置文件的操作配置（select），id属性的取值必须是dao接口的方法名
+
+### Mybatis基于注解的入门案例
+
+* 把UserDao.xml移除，在Dao接口的方法上使用@Select注解，并且指定SQL语句，同时需要在SqlMapCinfig.xml中的mapper配置时，使用class属性指定Dao接口的全限定类名
+
+  ```java
+  //1、读取配置文件
+          InputStream in = Resources.getResourceAsStream("SqlMapConfig.xml");
+          //2、创建SqlSessionFactory工厂
+          SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+          SqlSessionFactory factory = builder.build(in);
+          //3、使用工厂生产SqlSession对象
+          SqlSession session = factory.openSession();
+          //4、使用SqlSession创建Dao接口的代理对象
+          UserDao userDao = session.getMapper(UserDao.class);
+          //5、使用代理对象执行方法
+          List<User> users = userDao.findAll();
+          for (User user: users) {
+              System.out.println(user);
+          }
+          //6、释放资源
+          session.close();
+          in.close();
+  ```
+
+
+### mybatis中的一些问题
+
+* 向数据库中插入中文乱码
+
+  * 解决办法：在数据库连接信息后添加?useUnicode=true&amp;characterEncoding=UTF-8"
+
+    & 在 xml会需要转义 如
+
+```xml
+?useUnicode=true&amp;characterEncoding=UTF-8"
+```
+
+
+
