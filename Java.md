@@ -1089,5 +1089,330 @@ System.out.println("msg:"+msg);
 ?useUnicode=true&amp;characterEncoding=UTF-8"
 ```
 
+### properties标签
+
+```properties
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/maven?useUnicode=true&amp;characterEncoding=UTF-8
+jdbc.username=root
+jdbc.password=123
+```
+
+在xml配置文件中可以写
+
+```xml
+<properties resource="jdbcConfig.properties">
+
+</properties>
+```
+
+或者使用url
+
+* url格式: **file:///路径名**
+
+```xml
+<properties url="file:///D:/IDEAworkstation/mybatis_01/src/main/resources/jdbcConfig.properties">
+</properties>
+```
+
+### mybatis中属性名和数据库表中列名不一致
+
+1. 起别名   
+
+   比如  select id as userId  from user
+
+2. 配置resultMap然后将select标签中的resultType属性改为resultMap
+
+   ```xml
+   <!-- 配置属性名和列名对应 -->
+   <resultMap id="userMap" type="domain.User">
+   	<!-- 主键字段的对应 -->
+       <id property="userId" column="id"></id>
+       <!-- 非主键字段的对应 -->
+       <result property="userName" column="username"></result>
+   </resultMap>
+   ```
+
+### 使用typeAliases配置别名
+
+```xml
+<!-- 使用typeAliases配置别名它只能配置domain中类的别名 -->
+    <typeAliases>
+        <!--typeAlias用于配置别名，type属性指定的是实体类全限定类名 alias属性指定别名 指定别名后不再区分大小写 -->
+        <typeAlias type="domain.User" alias="user">			         </typeAlias>
+        
+        <!-- 用于指定要配置别名的包 指定后该包下的实体类都会注册别名并且别名就是类名 不再区分大小写 -->
+        <package name="domain"/>
+    </typeAliases>
+```
+
+* mapper中的package
+
+  ```xml
+  <!-- 指定映射配置文件的位置，映射配置文件指的是每个dao独立的配置文件 -->
+      <mappers>
+          <!-- <mapper resource="dao/UserDao.xml"/> -->
+          <!-- package用于指定dao接口所在的包，指定之后就不需要再写mapper以及resource或者class了 -->
+          <package name="dao"/>
+      </mappers>
+  ```
+
+  ### mybatis中的连接池
+
+  1. 配置的位置：
+
+     * 主配置文件SqlMapConfig.xml中的dateSource标签，type属性就是表示采用何种连接池方式
+
+     * type属性的取值：
+
+       1. POOLED：采用传统的javax.sql.DataSource规范中的连接池，mybatis中有针对规范的实现
+
+          * 从池中获取一个连接来用
+
+       2. UNPOOLED：采用传统的获取连接的方式，虽然也实现javax.sql.Datasource接口，但是并没有使用池的思想
+
+          * 每次都创建一个新的连接来用
+
+       3. JNDI：采用服务器提供的JNDI技术实现，来获取DataSource对象，不同的服务器所能拿到的DataSource是不一样的。
+
+          **注意**：如果不是web或者maven中的war工程，是不能使用的
+
+          ​			使用的tomcat服务器，采用连接池就是dbcp连接池。
+
+### mybatis中的事务
+
+如果把opensession方法中的参数写成true就可以不用写commit操作
+
+```java
+//sqlSession = factory.openSession();
+sqlSession = factory.openSession(true);
+```
+
+## Mybatis映射文件的SQL深入
+
+### if标签
+
+```xml
+<!-- 根据条件查询 -->
+    <select id="findUserByCondition" resultType="domain.User" parameterType="user">
+        select * from user where 1=1
+        <if test="username != null">
+            and username = #{username}
+        </if>
+        <if test="sex != null">
+            and sex = #{sex}
+        </if>
+        <if test="address != null">
+            and address = #{address}
+        </if>
+        <if test="id != null">
+            and id = #{id}
+        </if>
+    </select>
+```
+
+### where标签
+
+```xml
+<!-- 根据条件查询 -->
+    <select id="findUserByCondition" resultType="domain.User" parameterType="user">
+        select * from user
+        <where>
+            <if test="username != null">
+                and username = #{username}
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+            <if test="address != null">
+                and address = #{address}
+            </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+    </select>
+```
+
+### foreach标签
+
+* 注意：   #{uid} 中的uid要和item标签中的变量名称一样
+
+```xml
+<!-- 根据QueryVo中的id集合实现查询用户 -->
+    <select id="findUserInIds" resultType="user" parameterType="domain.QueryVo">
+        select * from user
+        <where>
+            <if test="ids != null and ids.size() >0">
+                <foreach collection="ids" open="and id in (" close=")" item="uid" separator=",">
+                    #{uid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+```
+
+### 抽取重复的SQL语句
+
+* 定义后可直接在其他语句中引用
+
+```xml
+<sql id="defaultUser">
+	select * from user
+</sql>
+```
+
+```xml
+<select id="findAll" resultType="domain.User">
+	<include refid="defaultUser"></include>
+</select>
+```
+
+### mybatis中多表查询
+
+```xml
+<mapper namespace="dao.UserDao">
+    <!-- 定义封装ccount和user的resultMap -->
+    <resultMap id="userMap" type="user">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="address" column="address"></result>
+        <result property="sex" column="sex"></result>
+        <result property="birthday" column="birthday"></result>
+        <collection property="roles" ofType="role">
+            <id property="roleId" column="rid"></id>
+            <result property="roleName" column="role_name"></result>
+            <result property="roleDesc" column="role_desc"></result>
+        </collection>
+    </resultMap>
+    <!-- 查询所有 -->
+    <select id="findAll" resultMap="userMap">
+        SELECT user.*,role.id as rid,role.role_name,role.role_desc FROM user
+        LEFT outer join user_role on user_role.uid=user.id
+        LEFT outer join role on user_role.rid=role.id
+    </select>
+```
+
+### Mybatis中的延迟加载
+
+* 延迟加载：在真正使用数据时才发起查询，不用的时候不查询。按需加载（懒加载）
+  * 一对多、多对多
+* 立即加载：不管用不用，只要一调用方法，马上发起查询
+  * 多对一、一对一
+
+#### lazyLoadingEnabled：                     Mybatis延迟加载全局开关，默认为false
+
+#### aggressiveLazyLoading：                值为false时按需加载，默认值为false
+
+#### 延迟加载的实现
+
+1. 在全局配置文件中设置延迟加载为true
+
+   ```xml
+       <!-- 配置懒加载参数 -->
+       <settings>
+           <!-- 开启Mybatis延迟加载开关 -->
+           <setting name="lazyLoadingEnabled" value="true"/>
+           <setting name="aggressiveLazyLoading" value="false"/>
+       </settings>
+   ```
+
+2. 在查找配置文件中配置
+
+   ```xml
+    <!-- 定义封装ccount和ser的resultMap -->
+       <resultMap id="accountUserMap" type="account">
+           <id property="id" column="id"></id>
+           <result property="uid" column="uid"></result>
+           <result property="money" column="money"></result>
+           <!-- 一对一的关系映射：配置封装user的内容
+               select属性指定的内容：查询用户的唯一标志
+               column属性指定的内容：用户根据id查询时，所需要的参数的值
+           -->
+           <association property="user" column="uid" javaType="user" select="dao.UserDao.findById"></association>
+       </resultMap>
+   ```
+
+### Mybatis中的缓存
+
+#### 一级缓存
+
+* Mybatis中SqlSession对象的缓存
+
+  * 执行查询之后，查询的结果会同时存入到SqlSession提供的一块区域中。该区域的结构是一个Map，如果再次查询同样的数据，mybatis会先去SqlSession中查询；当SqlSession对象消失时，mybatis的一级缓存也就消失了。
+
+* 当调用SqlSession对象的修改、添加、删除、commit()、close()等方法时就会清空一级缓存。
+
+* SqlSession对象的**clearCache**方法也可以清空缓存
+
+  ```java
+  		User user1 = userDao.findById(7);
+          System.out.println(user1);
+  
+  //        sqlSession.close();
+  //        sqlSession=factory.openSession();
+          sqlSession.clearCache();
+  //        userDao = sqlSession.getMapper(UserDao.class);
+          User user2 = userDao.findById(7);
+          System.out.println(user2);
+  
+          System.out.println(user1 == user2);
+  ```
 
 
+#### 二级缓存
+
+* Mybatis中SqlSessionFactory对象的缓存，由同一个SqlSessionFactory对象创建的SqlSession共享其缓存
+
+* 使用步骤
+
+  1. 让Mybatis框架支持二级缓存（在SqlMapConfig.xml中配置）
+
+     * 不配置也可以，默认为true
+
+     ```xml
+     <settings>
+             <setting name="cacheEnabled" value="true"/>
+         </settings>
+     ```
+
+  2. 让当前的映射文件支持二级缓存（在UserDao.xml中配置）
+
+     * <cache/>
+
+  3. 让当前的操作支持二级缓存（在select标签中配置 ）
+
+     * select标签中添加useCache="true"
+
+     ```xml
+     <mapper namespace="dao.UserDao">
+         <!--  开启user支持二级缓存 -->
+         <cache/>
+         <!-- 查询所有 -->
+         <select id="findAll" resultType="user">
+             select * from user
+         </select>
+         <!-- 根据id查询一个用户 -->
+         <select id="findById" parameterType="INT" resultType="user" useCache="true">
+             select * from user where id=#{id};
+         </select>
+     ```
+
+
+### Mybatis中的注解开发
+
+* 注解的是UserDao.xml中的语句，全局配置文件SqlMapConfig.xml将会仍然存在
+
+* 在Mybatis中，针对CRUD共有四个注解
+
+  1. @Select
+
+     ```java
+     @Select("select * from user")
+     ```
+
+  2. @Insert
+
+  3. @Update
+
+  4. @Delete
