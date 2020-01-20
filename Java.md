@@ -1132,6 +1132,30 @@ jdbc.password=123
        <result property="userName" column="username"></result>
    </resultMap>
    ```
+   
+3. 注解方式
+
+   * 在@Select下增加@Results,多次使用可以使用@ResultMap获取Results标签中的id属性 
+
+     ```java
+     //查询所有
+         @Select("select * from user")
+         @Results(id = "userMap" , value = {
+                 @Result(id=true,column = "id",property = "userId"),
+                 @Result(column = "username",property = "userName"),
+                 @Result(column = "birthday",property = "userBirthday"),
+                 @Result(column = "sex",property = "userSex"),
+                 @Result(column = "address",property = "userAddress")
+         })
+         List<User> findAll();
+     
+     //根据id查询用户
+         @Select("select * from user where id=#{id}")
+         @ResultMap(value ={"userMap"})
+         User findById(Integer Id);
+     ```
+
+     
 
 ### 使用typeAliases配置别名
 
@@ -1187,6 +1211,27 @@ jdbc.password=123
 //sqlSession = factory.openSession();
 sqlSession = factory.openSession(true);
 ```
+
+### 获取新插入数据的id
+
+* 在配置文件中配置如下
+
+  ```xml
+   <!-- 配置保存用户 -->
+      <insert id="saveUser" parameterType="domain.User">
+          <!-- 配置插入操作后，获取插入数据的id -->
+          <selectKey keyProperty="id" keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+              select last_insert_id();
+          </selectKey>
+          insert into user(username,address,sex,birthday)values(#{username},#{address},#{sex},#{birthday});
+      </insert>
+  ```
+
+* 在测试方法中保存数据后使用
+
+  ```java
+  System.out.println("新插入数据id为："+user.getId());
+  ```
 
 ## Mybatis映射文件的SQL深入
 
@@ -1379,11 +1424,12 @@ sqlSession = factory.openSession(true);
   2. 让当前的映射文件支持二级缓存（在UserDao.xml中配置）
 
      * <cache/>
-
-  3. 让当前的操作支持二级缓存（在select标签中配置 ）
-
-     * select标签中添加useCache="true"
-
+   * 在注解模式中在Dao接口上添加**@CacheNamespace(blocking = true)**即可
+  
+3. 让当前的操作支持二级缓存（在select标签中配置 ）
+  
+   * select标签中添加useCache="true"
+   
      ```xml
      <mapper namespace="dao.UserDao">
          <!--  开启user支持二级缓存 -->
@@ -1416,3 +1462,17 @@ sqlSession = factory.openSession(true);
   3. @Update
 
   4. @Delete
+
+# Spring
+
+### 解耦：降低程序间的依赖关系
+
+* 实际开发中应该做到：编译期不依赖，运行时才依赖
+* 解耦思路：
+  1. 使用反射来创建对象，而避免使用new关键字
+  2. 通过读取配置文件来获取要创建的对象全限定类名
+
+## IOC
+
+* 概念：控制反转(Inversion of Control)把创建对象的权利交给框架，是框架的重要特征，并非面向对象编制的专用术语。它包括依赖注入(Dependency Injextion,简称DI)和依赖查找(Dependency Lookup)
+* 作用：削减计算机程序的耦合（解除代码中的依赖关系）
