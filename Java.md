@@ -1681,23 +1681,24 @@ sqlSession = factory.openSession(true);
 
    * 作用和在xml配置文件中编写一个<bean>标签实现的功能是一样的。
 
-   1. @Component:    用于把当前类对象存入spring容器中
+   1. ##### @Component:    用于把当前类对象存入spring容器中
+      
       * 属性：
         1. value：用于指定bean的id，默认值是当前类名且首字母改小写
-   2. @Controller:      作用与属性同@Component相同     **一般用在表现层**
-   3. @Service:           作用与属性同@Component相同     **一般用在业务层**
-   4. @Repository:     作用与属性同@Component相同     **一般用在持久层**
+   2. ##### @Controller:      作用与属性同@Component相同     **一般用在表现层**
+   3. ##### @Service:           作用与属性同@Component相同     **一般用在业务层**
+   4. ##### @Repository:     作用与属性同@Component相同     **一般用在持久层**
 
 2. 用于注入数据的：
 
    * 作用和在xml配置文件中的<bean>标签中写一个<property>标签的作用是一样的。
 
-   1. @Autowired:      自动按照类型注入。只要容器中有唯一的一个bean对象类型和要注入的变量类型匹配，就可以注入成功；如果IOC容器中没有任何bean的类型和要注入的变量类型匹配，则报错；如果IOC容器中有多个类型匹配时，首先匹配类型相符的，然后匹配变量名称相符的，如果都不相符则报错      **只能注入其他bean类型的数据**
+   1. ##### @Autowired:      自动按照类型注入。只要容器中有唯一的一个bean对象类型和要注入的变量类型匹配，就可以注入成功；如果IOC容器中没有任何bean的类型和要注入的变量类型匹配，则报错；如果IOC容器中有多个类型匹配时，首先匹配类型相符的，然后匹配变量名称相符的，如果都不相符则报错      **只能注入其他bean类型的数据**
 
       * 出现位置：可以说变量上，也可以是方法上
       * 细节：        在使用注解注入时，set方法就不是必须的了
 
-   2. @Qualifier：          在按照类中注入的基础之上再按照名称注入。它在给类成员注入时不能单独使用，但是在给方法参数注入时可以   **只能注入其他bean类型的数据**
+   2. ##### @Qualifier：          在按照类中注入的基础之上再按照名称注入。它在给类成员注入时不能单独使用，但是在给方法参数注入时可以   **只能注入其他bean类型的数据**
 
       * 属性：
         * value：    用于指定注入bean的id
@@ -1712,7 +1713,7 @@ sqlSession = factory.openSession(true);
           }
       ```
 
-   3. @Resource：      直接按照bean的id注入。**可以独立使用**    **只能注入其他bean类型的数据**
+   3. ##### @Resource：      直接按照bean的id注入。**可以独立使用**    **只能注入其他bean类型的数据**
 
       * 属性：
         * name：    用于指定bean的id
@@ -1722,17 +1723,30 @@ sqlSession = factory.openSession(true);
           private AccountDao accountDao;
       ```
 
-   4. @Value：      用于注入基本类型和String类型的数据
+   4. ##### @Value：      用于注入基本类型和String类型的数据
 
       * 属性：
         * value：        用于指定数据的值。它可以使用spring中的SpEL（即spring的el表达式）
+        
         * SpEL的写法：${表达式}
+        
+          ```java
+          @Value("${jdbc.driver}")
+              private String driver;
+              @Value("${jdbc.url}")
+              private String url;
+              @Value("${jdbc.username}")
+              private String username;
+              @Value("${jdbc.password}")
+              private String password;
+          ```
 
 3. 用于改变作用范围的：
 
    * 作用和在<bean>标签中使用scope属性实现的功能是一样的。
 
-   1. @Scope：            用于指定bean的作用范围
+   1. ##### @Scope：            用于指定bean的作用范围
+      
       * 属性：
         * value：    指定范围的取值。 常用取值：singleton和prototype
 
@@ -1740,8 +1754,8 @@ sqlSession = factory.openSession(true);
 
    * 作用和在<bean>标签中使用init-method和destory-method的作用是一样的。
 
-   1. PostConstruct：  用于指定初始方法
-   2. PreDestroy：        用于指定销毁方法
+   1. ##### PostConstruct：  用于指定初始方法
+   2. ##### PreDestroy：        用于指定销毁方法
 
 #### 在xml中加入注解需要的配置
 
@@ -1765,6 +1779,7 @@ sqlSession = factory.openSession(true);
 #### @Configuration
 
 * 作用：指定当前类是一个配置类
+* 细节：当配置类作为AnnotationConfigApplicationContext对象创建的参数时，该注解可以不写
 
 #### @ComponentScan
 
@@ -1788,3 +1803,198 @@ sqlSession = factory.openSession(true);
 
 **** 当我们使用注解配置方法时，如果方法有参数，spring框架会去容器中查找有没有可用的bean对象，查找的方式和Autowired注解的方式相同
 
+### @Import
+
+* 作用：用于导入其他的配置类
+* 属性：
+  * value：用于指定其他配置类的字节码
+
+### @PropertySource
+
+```java
+@PropertySource("classpath:jdbcConfig.properties")
+```
+
+* 作用：用于指定properties文件的位置
+* 属性：
+  * value：指定文件的名称和路径
+    * 关键字：classpath：表示类路径下
+
+## Spring整合Junit的配置
+
+#### 第一步：导入spring整合junit的jar（坐标）
+
+```xml
+<dependency>
+    <groupId>org.springframework</groupId>    					     <artifactId>spring-test</artifactId>       	      <version>5.0.2.RELEASE</version>
+</dependency>
+```
+
+### 第二步：使用Junit提供的一个注解把原有的main方法替换掉，替换成spring提供的@RunWith
+
+   * 在测试类上加上注解
+
+     ```java
+     @RunWith(SpringJUnit4ClassRunner.class)
+     ```
+
+### 第三步：告知spring的运行器，spring的Ioc创建是基于xml还是注解的，并且说明位置
+
+* @ContextConfiguration
+
+  * locations：指定xml文件的位置，加上classpath关键字，表示在类路径下
+  * classes：表示注解类所在位置
+
+  ```java
+  @ContextConfiguration(locations = "classpath:bean.xml")
+  @ContextConfiguration(classes = SpringConfiguration.class)
+  ```
+
+### 使用Spring 5.x版本的时候，要求Junit的jar必须是4.12及以上
+
+## AOP	
+
+**** **Aspect Oriented Programming      面向切面编程**
+
+#### XML配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+```
+
+#### 配置AOP步骤
+
+1. 把通知Bean也交给spring来管理
+
+2. 使用aop:config标签表明开始AOP的配置
+
+3. 使用aop:aspect标签表明配置切面
+
+   1. id属性：是给切面提供一个唯一标识
+   2. ref属性：是指定通知类bean的Id
+
+4. 在aop:aspect标签内部使用对应的标签来配置通知的类型
+
+   * aop:before：表示配置前置通知
+
+     * method属性：用于指定方法
+
+     * pointcut属性：用于指定切入点表达式。该表达式的含义是指对业务层中哪些方法增强
+
+     * 切入点表达式的写法：
+
+       * 关键字：execution(表达式)
+
+       * 表达式：
+
+         * 访问修饰符    返回值   包名.类名.方法名(参数l列表)
+         * 访问修饰符可以省略
+         * 返回值可以使用通配符表示任意返回值
+         * 包名可以使用通配符表示任意包。但是有几级包就需要写几个***.**
+         * 包名可以使用**..**表示当前包及其子包
+         * 类名和方法名都可以使用*****来实现通配
+         * 参数列表：
+           * 可以直接写数据类型：
+             * 基本类型直接写名称
+             * 引用类型写包名.类名的方式
+           * 可以使用通配符表示任意类型但是必须有参数
+           * 可以使用**..**表示有无参数均可，有参数可以是任意类型
+
+       * 实际开发中切入点表达式的通常写法：
+
+         * 切到业务层实现类下的所有方法：
+
+           * ```java
+             * com.lanpeople.service.impl.*.*(..)
+             ```
+
+           * 
+
+       * 标准表达式写法：
+
+         ```java
+         pointcut="execution(public void com.lanpeople.service.impl.AccountServiceImpl.saveService())"
+         ```
+
+       * 全通配写法：    
+
+         * ```java
+           * *..*.*(..)
+           ```
+
+         * 
+
+## 动态代理：
+
+* 特点：字节码随用随创建、随用随加载
+
+* 作用：不修改源码的基础上对方法增强
+
+* 分类：
+
+  * ### 基于接口的动态代理
+
+    * 涉及的类：Proxy
+    * 提供者：JDK官方
+    * 如何创建代理对象：
+      * 使用Proxy类中的newProxyInstance方法
+    * 创建代理对象的要求
+      * 被代理类最少要实现一个接口，如果没有则不能使用
+    * newProxyInstance方法的参数：
+      * ClassLoader:       类加载器
+        * 用于加载代理对象字节码，和被代理对象使用相同的类加载器
+        * 固定写法           类对象.getClass().getClassLoader()
+      * Class[]:                    字节码数组
+        * 用于让代理对象和被代理对象有相同方法
+        * 固定写法            类对象.getClass().getInterfaces()
+      * InvocationHandler:  用于提供增强的代码
+        * 写如何代理。一般都是写一个该接口的实现类，通常情况下都是匿名内部类，但不是必须的
+        * 此接口的实现类都是谁用谁写
+        * invoke方法：      执行被代理对象的任何接口方法都会经过该方法
+          - proxy：        代理对象的引用
+          - method：     当前执行的方法
+          - args：            当前执行方法所需的参数
+          - 返回值：        和被代理对象有相同的返回值
+
+    ```java
+    		Producer producer = new Producer();
+            IProducer proxyProducer =  (IProducer) Proxy.newProxyInstance(producer.getClass().getClassLoader(),producer.getClass().getInterfaces(),new InvocationHandler() {
+                        @Override
+                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                            return null;
+                        }
+                    });
+    ```
+
+  * ### 基于子类的动态代理
+
+    * 涉及的类：Enhancer
+    * 提供者：第三方cglib库
+    * 如何创建代理对象：
+      * 使用Enhamcer类中的create方法
+    * 创建代理对象的要求：
+      * 被代理类不能是最终类
+    * create方法的参数：
+      * Class：    字节码
+        * 用于指定被代理对象的字节码
+      * Callback：用于提供增强的代码
+        * 一般写的都是该接口的子接口实现类：MethodInterceptor           执行被代理对象的任何方法都会经过该方法
+
+  ```java
+          final Producer producer = new Producer();
+  
+          Enhancer.create(producer.getClass(), new MethodInterceptor() {
+              public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+                  return null;
+              }
+          });
+  ```
+
+  
