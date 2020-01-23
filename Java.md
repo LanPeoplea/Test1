@@ -960,7 +960,7 @@ System.out.println("msg:"+msg);
 
 # Mybatis
 
-		### 概述
+### 概述
 
 * 一个优秀的基于java的持久层框架，内部封装了jdbc，使开发者只需要关注sql语句本身，而不需要花费精力去处理加载驱动、创建连接、创建statement等繁杂的过程
 * 通过xml或注解方式将各种statement配置起来
@@ -1695,7 +1695,7 @@ sqlSession = factory.openSession(true);
 
    1. ##### @Autowired:      自动按照类型注入。只要容器中有唯一的一个bean对象类型和要注入的变量类型匹配，就可以注入成功；如果IOC容器中没有任何bean的类型和要注入的变量类型匹配，则报错；如果IOC容器中有多个类型匹配时，首先匹配类型相符的，然后匹配变量名称相符的，如果都不相符则报错      **只能注入其他bean类型的数据**
 
-      * 出现位置：可以说变量上，也可以是方法上
+      * 出现位置：可以是变量上，也可以是方法上
       * 细节：        在使用注解注入时，set方法就不是必须的了
 
    2. ##### @Qualifier：          在按照类中注入的基础之上再按照名称注入。它在给类成员注入时不能单独使用，但是在给方法参数注入时可以   **只能注入其他bean类型的数据**
@@ -1757,7 +1757,7 @@ sqlSession = factory.openSession(true);
    1. ##### PostConstruct：  用于指定初始方法
    2. ##### PreDestroy：        用于指定销毁方法
 
-#### 在xml中加入注解需要的配置
+## 在xml中加入注解需要的配置
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1819,6 +1819,10 @@ sqlSession = factory.openSession(true);
 * 属性：
   * value：指定文件的名称和路径
     * 关键字：classpath：表示类路径下
+
+### @Aspect
+
+* 作用：表示当前类是一个切面类
 
 ## Spring整合Junit的配置
 
@@ -1882,54 +1886,117 @@ sqlSession = factory.openSession(true);
 
 4. 在aop:aspect标签内部使用对应的标签来配置通知的类型
 
-   * aop:before：表示配置前置通知
+   * aop:before：表示前置通知
+* 在切入点方法执行之前执行
+   * aop:after-returning：表示后置通知           **和异常执行永远只能执行一个**
+* 在切入点方法正常执行之后执行
+   * aop:throwing：表示异常通知
+* 在切入点方法执行产生异常之后执行
+   * aop:after：表示最终通知
+  - 无论方法是否正常执行它都会在其后面执行
+   * aop:around：表示环绕通知
+  * 写在proceed方法前就是前置通知
+     * 写在proceed方法后就是后置通知
+  * 写在catch中就是异常通知
+     * 写在finally中就是最终通知
+   * method属性：用于指定方法
+   * pointcut属性：用于指定切入点表达式。该表达式的含义是指对业务层中哪些方法增强
+   
+   - 切入点表达式的写法：
+   
+     - 关键字：execution(表达式)
+   
+     - 表达式：
+   
+       - 访问修饰符    返回值   包名.类名.方法名(参数l列表)
+       - 访问修饰符可以省略
+    - 返回值可以使用通配符表示任意返回值
+       - 包名可以使用通配符表示任意包。但是有几级包就需要写几个***.**
+    - 包名可以使用**..**表示当前包及其子包
+       - 类名和方法名都可以使用*****来实现通配
+    - 参数列表：
+         - 可以直接写数据类型：
+           - 基本类型直接写名称
+           - 引用类型写包名.类名的方式
+      - 可以使用通配符表示任意类型但是必须有参数
+         - 可以使用**..**表示有无参数均可，有参数可以是任意类型
 
-     * method属性：用于指定方法
+     - 实际开发中切入点表达式的通常写法：
 
-     * pointcut属性：用于指定切入点表达式。该表达式的含义是指对业务层中哪些方法增强
-
-     * 切入点表达式的写法：
-
-       * 关键字：execution(表达式)
-
-       * 表达式：
-
-         * 访问修饰符    返回值   包名.类名.方法名(参数l列表)
-         * 访问修饰符可以省略
-         * 返回值可以使用通配符表示任意返回值
-         * 包名可以使用通配符表示任意包。但是有几级包就需要写几个***.**
-         * 包名可以使用**..**表示当前包及其子包
-         * 类名和方法名都可以使用*****来实现通配
-         * 参数列表：
-           * 可以直接写数据类型：
-             * 基本类型直接写名称
-             * 引用类型写包名.类名的方式
-           * 可以使用通配符表示任意类型但是必须有参数
-           * 可以使用**..**表示有无参数均可，有参数可以是任意类型
-
-       * 实际开发中切入点表达式的通常写法：
-
-         * 切到业务层实现类下的所有方法：
-
-           * ```java
-             * com.lanpeople.service.impl.*.*(..)
-             ```
-
-           * 
-
-       * 标准表达式写法：
-
-         ```java
-         pointcut="execution(public void com.lanpeople.service.impl.AccountServiceImpl.saveService())"
-         ```
-
-       * 全通配写法：    
-
-         * ```java
-           * *..*.*(..)
+       - 切到业务层实现类下的所有方法：
+   
+         - ```java
+        * com.lanpeople.service.impl.*.*(..)
            ```
 
-         * 
+     - 标准表达式写法：
+   
+       ```java
+    pointcut="execution(public void com.lanpeople.service.impl.AccountServiceImpl.saveService())"
+       ```
+   
+     - 全通配写法：    
+   
+       - ```java
+         * *..*.*(..)
+         ```
+   
+5. 配置切入点表达式
+
+   * aop:pointcut         写在<aop:aspect>标签内部只能当前切面使用；写在外部则所有切面可用，但必须定义在<aop:aspect>标签之前
+
+   ```xml
+   <!-- 配置AOP -->
+       <aop:config>
+           <aop:aspect id="logAdvice" ref="logger" >
+               <!-- 配置前置通知 -->
+               <aop:before method="beforePrintLog" pointcut-ref="pt1"/>
+   
+               <!-- 配置后置通知 -->
+               <aop:after-returning method="afterReturnPrintLog" pointcut-ref="pt1"/>
+   
+               <!-- 配置异常通知 -->
+               <aop:after-throwing method="afterThrowingPrintLog" pointcut-ref="pt1"/>
+   
+               <!-- 配置最终通知 -->
+               <aop:after method="afterPrintLog" pointcut-ref="pt1"/>
+   
+               <!-- 配置切入点表达式 id属性用于指定表达式的唯一标志 expression属性用于指定表达式内容-->
+               <aop:pointcut id="pt1" expression="execution(* com.lanpeople.service.impl.*.*(..))"/>
+           </aop:aspect>
+       </aop:config>
+   ```
+
+#### 注解AOP
+
+##### @Aspect     表示当前类是一个切面类
+
+##### @Before    前置通知
+
+##### @AfterReturning    后置通知
+
+##### @AfterThrowing    异常通知
+
+##### @After    最终通知
+
+##### @Around     环绕通知
+
+##### @Pointcut("execution(* com.lanpeople.service.impl.*.*(..))")    配置切入点表达式
+
+```java
+@Pointcut("execution(* com.lanpeople.service.impl.*.*(..))")
+    private void pt1(){}
+```
+
+#### 配置spring开启注解AOP的支持
+
+* 在xml中写上就支持
+
+```xml
+<aop:aspectj-autoproxy/>
+```
+
+* 或者在类上添加  @EnableAspectJAutoProxy
 
 ## 动态代理：
 
@@ -1997,4 +2064,6 @@ sqlSession = factory.openSession(true);
           });
   ```
 
+  ## JDBC Template
+  
   
