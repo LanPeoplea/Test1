@@ -26,3 +26,7 @@
 
 #### mvn install			 ：编译打包并安装到本地仓库
 
+#### 键值对
+
+* archetypeCatalog
+  * internal

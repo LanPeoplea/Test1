@@ -8,6 +8,8 @@
 
 #### 生成set/get方法		右键generate	或者	alt + insert
 
+#### 多行块注释    ctrl + shift + /
+
 #### ServletContext
 
 ##### 1、概念：代表整个web应用，可以和程序的容器（服务器）来通信
