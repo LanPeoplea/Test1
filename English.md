@@ -28,10 +28,16 @@
 
 
 
+##### Haste makes mistakes        欲速则不达
+
+##### instant gratification          即时满足
+
+##### delayed gratification         延迟满足  
+
 ## 那些语录
 
 * #### 我们总是喜欢拿”顺其自然“来敷衍人生路上的荆棘坎坷，却很少承认，真正的顺其自然，其实是竭尽所能之后的不强求，而非两手一摊的不作为。
 
   * ###### Instead of admitting that the truth of "Let it be" is to readily accept any kind of outcome after making full efforts rather than to do nothing at the very beginning, we'd rather take "Let it be" as an excuse to evade the path of thorns in our life. 
 
-* 
+* #### The past is a foreign country:     they do things differently there.               ——2020 03 12
